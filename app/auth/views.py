@@ -1,8 +1,8 @@
-from .forms import RegistrationForm, LoginForm, ForgotPasswordForm, ResetPasswordForm
+from .forms import RegistrationForm, LoginForm, ForgotPasswordForm, ResetPasswordForm, DeleteAccountForm
 from flask import redirect, render_template, url_for, flash
 from . import auth
 from ..models import User
-from flask_login import login_user, logout_user, login_required
+from flask_login import current_user, login_user, logout_user, login_required
 from .. import db
 from .utils import send_password_reset_email, verify_reset_token
 
@@ -69,7 +69,7 @@ def forgot_password():
     return render_template("auth/forgot_password.html", form=form)
 
 
-@auth.route("/reset-password/<token>", methods=["GET", "POST"])
+@auth.route("/reset_password/<token>", methods=["GET", "POST"])
 def reset_password(token):
     email = verify_reset_token(token)
     if not email:
@@ -89,3 +89,25 @@ def reset_password(token):
             flash("User not found.", "danger")
     
     return render_template("auth/reset_password.html", form=form)
+
+
+@auth.route("/delete_account", methods=["GET", "POST"])
+@login_required
+def delete_account():
+    form = DeleteAccountForm()
+    if form.validate_on_submit():
+        if current_user.check_password(form.confirm.data):
+            # delete users documents
+            for doc in current_user.documents:
+                db.session.delete(doc)
+            
+            # Delete the user account
+            db.session.delete(current_user)
+            db.session.commit()
+            flash("Your account has been deleted.", "success")
+            logout_user()
+            return redirect(url_for("auth.login"))
+        else:
+            flash("Incorrect password. Please try again.", "danger")
+    
+    return render_template("auth/delete_account.html", form=form)

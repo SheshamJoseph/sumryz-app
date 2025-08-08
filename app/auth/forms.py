@@ -25,3 +25,7 @@ class ResetPasswordForm(FlaskForm):
     password = PasswordField('New Password', validators=[DataRequired(), Length(min=8)])
     confirm_password = PasswordField('Confirm Password', validators=[DataRequired(), EqualTo('password')])
     submit = SubmitField('Reset Password')
+    
+class DeleteAccountForm(FlaskForm):
+    confirm = PasswordField('Confirm Password.', validators=[DataRequired()])
+    submit = SubmitField('Delete Account')
