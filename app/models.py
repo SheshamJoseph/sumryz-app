@@ -1,13 +1,14 @@
-from .. import db
+from . import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
 
 
-class User(db.Model, UserMixin):
+class User(UserMixin, db.Model):
     __tablename__ = 'users'
     id = db.Column(db.Integer, primary_key=True)
-    username = db.Column(db.String(80), unique=True, nullable=False)
+    fname = db.Column(db.String(80), unique=False, nullable=False)
+    lname = db.Column(db.String(80), unique=False, nullable=False)
     email = db.Column(db.String(120), unique=True, nullable=False)
     password = db.Column(db.String(128), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.utcnow, nullable=False)
@@ -21,7 +22,7 @@ class User(db.Model, UserMixin):
         return check_password_hash(self.password, password)
     
     def __repr__(self):
-        return f'<User {self.username}>'
+        return f'<User {self.fname} {self.lname}>'
 
 # the table that stores the documents user's have summarized
 class Documents(db.Model):
