@@ -5,6 +5,7 @@ from flask_login import LoginManager
 from flask_mail import Mail
 from config import configs
 
+
 db = SQLAlchemy()
 mail = Mail()
 login_manager = LoginManager()
@@ -31,9 +32,13 @@ def create_app(config_name='default'):
     
     # Initialize the login manager
     
-    # login_manager.login_view = 'auth.login'
+    # login_manager.login = 'auth.login'
     login_manager.init_app(app)
     
     # Register blueprints or other app components here
+    from .auth import auth as auth_blueprint
+    
+    app.register_blueprint(auth_blueprint, url_prefix='/auth')
+    
     
     return app
