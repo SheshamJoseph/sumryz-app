@@ -1,17 +1,17 @@
 from .forms import RegistrationForm, LoginForm, ForgotPasswordForm, ResetPasswordForm, DeleteAccountForm
 from flask import redirect, render_template, url_for, flash
 from . import auth
-from ..models import User, Documents
+from ..models import User
 from flask_login import current_user, login_user, logout_user, login_required
 from .. import db
 from .utils import send_password_reset_email, verify_reset_token
 
 
-@auth.route("/", methods=["GET"])
-def index():
-    # if current_user.is_authenticated:
-    #     return redirect(url_for("index"))
-    return render_template("index.html")
+# @auth.route("/", methods=["GET"])
+# def index():
+#     # if current_user.is_authenticated:
+#     #     return redirect(url_for("index"))
+#     return render_template("index.html")
 
 @auth.route("/signup", methods=["GET", "POST"])
 def sign_up():
@@ -46,7 +46,7 @@ def login():
             if user is not None and user.check_password(form.password.data):
                 login_user(user, form.remember.data)
                 flash("Logged in Successfully")
-                return redirect(url_for("index"))
+                return redirect(url_for("home"))
         except:
             pass
     return render_template("auth/login.html", form=form)

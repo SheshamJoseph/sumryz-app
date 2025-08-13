@@ -16,6 +16,7 @@ def create_app(config_name='default'):
     
     # Load the configuration
     app.config.from_object(configs[config_name])
+    configs[config_name].init_app(app)
     
     # configure mail settings
     app.config['MAIL_SERVER'] = 'smtp.gmail.com'
@@ -37,7 +38,9 @@ def create_app(config_name='default'):
     
     # Register blueprints or other app components here
     from .auth import auth as auth_blueprint
+    from .main import main as main_blueprint
     
+    app.register_blueprint(main_blueprint)
     app.register_blueprint(auth_blueprint, url_prefix='/auth')
     
     
