@@ -2,7 +2,11 @@ from . import db
 from datetime import datetime
 from werkzeug.security import generate_password_hash, check_password_hash
 from flask_login import UserMixin
+from . import login_manager
 
+@login_manager.user_loader
+def load_user(user_id):
+    return User.query.get(int(user_id))
 
 class User(UserMixin, db.Model):
     __tablename__ = 'users'
@@ -23,6 +27,22 @@ class User(UserMixin, db.Model):
     
     def __repr__(self):
         return f'<User {self.fname} {self.lname}>'
+    
+    def is_authenticated(self):
+        """Check if the user is authenticated."""
+        return True
+    
+    def is_active(self):
+        """Check if the user is active."""
+        return True
+    
+    def is_anonymous(self):
+        """Check if the user is anonymous."""
+        return False
+    
+    def get_id(self):
+        return str(self.id)
+
 
 # the table that stores the documents user's have summarized
 class Documents(db.Model):
