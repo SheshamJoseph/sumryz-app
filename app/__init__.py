@@ -33,7 +33,7 @@ def create_app(config_name='default'):
     
     # Initialize the login manager
     
-    # login_manager.login = 'auth.login'
+    login_manager.login = 'auth.login'
     login_manager.init_app(app)
     
     # Register blueprints or other app components here

@@ -1,3 +1,4 @@
+import traceback
 from .forms import RegistrationForm, LoginForm, ForgotPasswordForm, ResetPasswordForm, DeleteAccountForm
 from flask import redirect, render_template, url_for, flash
 from . import auth
@@ -31,8 +32,10 @@ def sign_up():
             # Possible account creation confirmation
             
             return redirect(url_for("auth.login"))
-        except:
-            flash("Error creating account")
+        except Exception as e:
+            flash(f"Error creating account: {e}")
+            print(f"Error creating account: {e}")
+            traceback.print_exc()
     return render_template("auth/sign_up.html", form=form)
 
 
@@ -46,9 +49,11 @@ def login():
             if user is not None and user.check_password(form.password.data):
                 login_user(user, form.remember.data)
                 flash("Logged in Successfully")
-                return redirect(url_for("home"))
-        except:
-            pass
+                return redirect(url_for("main.home"))
+        except Exception as e:
+            flash(f"Error logging in: {e}")
+            print(f"Error logging in: {e}")
+            traceback.print_exc()
     return render_template("auth/login.html", form=form)
 
 
