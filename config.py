@@ -4,12 +4,15 @@ basedir = os.path.abspath(os.path.dirname(__file__)) # Get the directory of the 
 
 class Config:
     SECRET_KEY = os.environ.get('SECRET_KEY') or 'sghcjnjdscnjknducjnnuebfcncnjdncn'
-    UPLOAD_FOLDER = os.path.join(basedir, 'uploads')
+    UPLOAD_FOLDER = os.path.join(basedir, 'instance', 'uploads')
+    SUMMARY_FOLDER = os.path.join(basedir, 'instance', 'summaries')
+    MAX_CONTENT_LENGTH = 16 * 1024 * 1024
+    ALLLOWED_EXTENSIONS = {'txt', 'pdf', 'docx', 'doc'}
     
     @staticmethod
     def init_app(app):
-        # Initialize any app-specific configurations here
-        pass
+        os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
+        os.makedirs(Config.SUMMARY_FOLDER, exist_ok=True)
     
 class DevelopmentConfig(Config):
     DEBUG = True
