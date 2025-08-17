@@ -30,8 +30,7 @@ def extract_text_from_file(file_path):
 def allowed_files(filename):
     return '.' in filename and filename.rsplit('.', 1)[1].lower() in ALLOWED_EXTENSIONS
 
-
-def cohere_summarizer(text_document):
+def cohere_summarizer(text_document) -> str:
     import cohere
     from cohere import UserChatMessageV2
     from dotenv import load_dotenv
@@ -47,9 +46,15 @@ def cohere_summarizer(text_document):
     client = cohere.ClientV2(api_key=COHERE_API_KEY)
     message = f"Summarize the following text into concise, well-strucutured notes. Use bullet points where helpful. Highlight the main ideas, key terms, and important concepts, avoiding unnecessary specifics. Keep the summary clear and easy to scan.\n\n{text_document}"
     
-    response = client.chat(
-        model="command-a-03-2025",
-        messages=[UserChatMessageV2(role="user", content=message)],
-    )
-
-    return response.message.content if response.message else "No summary generated."
+    try: 
+        response = client.chat(
+            model="command-a-03-2025",
+            messages=[UserChatMessageV2(content=message)],
+        )
+    except Exception as e:
+        raise RuntimeError(f"Failed to summarize text: {str(e)}")
+    
+    if response.message:
+        return response.message.content.strip()    # type: ignore
+    else:
+        raise RuntimeError(f"Failed to summarize text: No message in response.")
