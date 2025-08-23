@@ -6,57 +6,58 @@ from .. import db
 from flask_login import login_required, current_user
 from .forms import ChatForm
 from .utils import extract_text_from_file, allowed_files, cohere_summarizer
-import tempfile
-# for creating PDF summaries
-from reportlab.lib.pagesizes import letter
-from reportlab.pdfgen import canvas
+import markdown2
+from markdown_pdf import MarkdownPdf, Section
 
 @main.route('/', methods=['GET', 'POST'])
 def home():
+    if current_user.is_authenticated:
+        return redirect(url_for('main.chat'))
 
     return render_template('index.html')
 
 @main.route('/chat', methods=['GET', 'POST'])
 @login_required
-def upload_file():
+def chat():
     form = ChatForm()
+    messages = []
+    documents = Documents.query.filter_by(user_id=current_user.id).all()  # fetch docs for sidebar
+
     if form.validate_on_submit():
         text_input = form.message.data
         file_input = form.file.data
         
         extracted_text = None
-        summarized_text: str = ""
+        summarized_text = ""
 
         if file_input and allowed_files(file_input.filename):
-            with tempfile.NamedTemporaryFile(delete=False) as temp_file:
-                file_input.save(temp_file.name)
-                extracted_text = extract_text_from_file(temp_file.name)
+            print("File uploaded")
+            print(file_input.filename)
+            extracted_text = extract_text_from_file(file_input)
         
-        elif extracted_text:
+        elif text_input:
             extracted_text = text_input
         
         else:
             flash('Please upload a docx, pdf, or txt file. Or just paste content in the textbox.', 'error')
-            return redirect(url_for('main.upload_file'))
+            return redirect(url_for('main.chat'))
 
         try:
             summarized_text = cohere_summarizer(extracted_text)
         except Exception as e:
             flash(f"Error during summarization", 'error')
             print(f"Error during summarization:  {str(e)}")
-            return redirect(url_for('main.upload_file'))
+            return redirect(url_for('main.chat'))
         
         # persist summary as .pdf
         doc_id = uuid.uuid4().hex[:12]
         summary_filename = f'summary_{doc_id}.pdf'
         summary_filepath = os.path.join(current_app.config['SUMMARY_FOLDER'], summary_filename)
-        c = canvas.Canvas(summary_filepath, pagesize=letter)
-        text_object = c.beginText(40, 750)
-        for line in summarized_text.split('\n'):
-            text_object.textLine(line)
-        c.drawText(text_object)
-        c.save()
         
+        summary_pdf = MarkdownPdf()
+        summary_pdf.add_section(Section(summarized_text))
+        summary_pdf.save(summary_filepath)
+
         # save document info to the database
         document = Documents(
             user_id=current_user.id,
@@ -67,11 +68,21 @@ def upload_file():
         db.session.add(document)
         db.session.commit()
         
+        # Add message for display
+        if text_input:
+            messages.append({"user": "me", "text": markdown2.markdown(text_input)})
+        if summarized_text:
+             messages.append({"user": "other", "text": markdown2.markdown(summarized_text)})
 
         flash('Summary generated and saved.', 'success')
-        return redirect(url_for('main.home'))
+        return render_template('chat.html', form=form, messages=messages, documents=documents)
     
-    return render_template('chat.html', form=form)
+    else:
+        print("Not validated")
+
+    
+    return render_template('chat.html', form=form, messages=messages, documents=documents)
+
 
 
 def _safe_remove(file_path):
@@ -82,13 +93,6 @@ def _safe_remove(file_path):
     except:
         pass
     
-    
-@main.route('/documents', methods=['GET'])
-@login_required
-def list_documents():
-    """List all summarized documents for the current user."""
-    documents = Documents.query.filter_by(user_id=current_user.id).all()
-    return render_template('documents.html', documents=documents)
 
 @main.route('/documents/<int:doc_id>/download', methods=['GET'])
 @login_required
@@ -115,4 +119,4 @@ def delete_document(doc_id):
     db.session.delete(doc)
     db.session.commit()
     flash('Document deleted successfully.', 'success')
-    return redirect(url_for('main.list_documents'))
+    return redirect(url_for('main.chat'))

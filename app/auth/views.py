@@ -62,7 +62,7 @@ def login():
 def logout():
     logout_user()
     flash("Logged out successfully.")
-    return redirect(url_for("login"))
+    return redirect(url_for("auth.login"))
 
 
 @auth.route("/forgot_password", methods=["GET", "POST"])

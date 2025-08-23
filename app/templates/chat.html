@@ -1,0 +1,64 @@
+{% extends "base.html" %}
+{% block title %}Chat - Sumryz{% endblock %}
+{% block content %}
+
+<!-- TODO: List all the stored documents for that user -->
+<div class="chat-sidebar">
+    <h3>Your Documents</h3>
+    <ul class="document-list">
+        {% for doc in documents %}
+        <li class="document-item">
+            <span>{{ doc.title }}</span>
+            <a href="{{ url_for('main.download', doc_id=doc.id) }}" class="btn-sm">⬇️</a>
+            <form action="{{ url_for('main.delete_document', doc_id=doc.id) }}" method="POST" style="display:inline;">
+                <button type="submit" class="btn-sm">🗑️</button>
+            </form>
+        </li>
+        {% else %}
+        <li class="document-item empty">No documents yet.</li>
+        {% endfor %}
+    </ul>
+</div>
+
+<div class="chat-wrapper">
+    <!-- Chat history -->
+    <div class="chat-history" id="chatHistory">
+        {% for message in messages %}
+        <div class="chat-message-card {% if message.user == 'me' %}me{% else %}other{% endif %}">
+            <div class="chat-message-content">
+                {{ message.text| safe }}
+            </div>
+        </div>
+        {% endfor %}
+    </div>
+
+    <!-- Let user see if the file has been uploaded -->
+    <!-- Chat input form -->
+    <form class="chat-form" id="chatForm" method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        <label class="file-upload">
+            📎
+            <input type="file" name="file" accept=".txt,.pdf,.docx" hidden onchange="showFileName(this)">
+        </label>
+        <span id="file-name" class="file-name"></span>
+        <textarea 
+            class="message-input" 
+            name="message" 
+            placeholder="Type a message or upload lecture notes..." 
+            rows="3">
+        </textarea>
+        <button type="submit" class="chat-btn-primary">➤</button>
+    </form>
+</div>
+
+<script>
+function showFileName(input) {
+    const fileNameSpan = document.getElementById('file-name');
+    if (input.files && input.files[0]) {
+        fileNameSpan.textContent = input.files[0].name;
+    } else {
+        fileNameSpan.textContent = '';
+    }
+}
+</script>
+{% endblock %}

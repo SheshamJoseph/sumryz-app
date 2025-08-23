@@ -1,7 +1,12 @@
 {% extends "base.html" %}
-
-{% block title %}Lecture summarizer app {% endblock %}
-
+{% block title %}Welcome - Sumryz{% endblock %}
 {% block content %}
-
+<div class="card hero-card">
+    <h1>Turn hours of Lectures into minutes of clarity.</h1>
+    <p>Upload, summarize, and learn faster with our AI-powered tool designed for students.</p>
+    <div class="cta-buttons">
+        <a href="{{ url_for('auth.sign_up') }}" class="btn-primary">Get Started</a>
+        <a href="{{ url_for('auth.login') }}" class="btn-secondary">Login</a>
+    </div>
+</div>
 {% endblock %}

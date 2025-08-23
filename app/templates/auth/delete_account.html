@@ -1,19 +1,19 @@
 {% extends 'base.html' %}
-
 {% block title %}Delete Account{% endblock %}
-
 {% block content %}
+<div class="card form-card">
     <h2>Delete Account</h2>
     <p>This action is permanent. Please confirm your password to proceed.</p>
     <form method="POST">
         {{ form.hidden_tag() }}
-        <label for="password">Password:</label>
+        <label for="password">Password</label>
         <input type="password" id="password" name="password" required>
-        <br>
-        <input type="submit" value="Delete Account">
-        <a href="{{ url_for('main.home') }}">Cancel</a>
+        <button type="submit" class="btn-primary">Delete Account</button>
+        <div class="form-footer">
+            <a href="{{ url_for('main.home') }}">Cancel</a>
+        </div>
         {% if form.errors %}
-            <ul>
+            <ul class="form-errors">
                 {% for error in form.errors.values() %}
                     <li>{{ error[0] }}</li>
                 {% endfor %}
@@ -26,4 +26,5 @@
             <p class="error">{{ error }}</p>
         {% endif %}
     </form>
+</div>
 {% endblock %}

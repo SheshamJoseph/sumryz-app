@@ -3,15 +3,33 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>{% block title %}Lecture Summarizer{% endblock %}</title>
-    <link rel="icon" type="image/x-icon" href="{{ url_for('static', filename='favicon.ico') }}">
-    <link rel="stylesheet" href="{{ url_for('static', filename='styles.css') }}">
+    <title>{% block title %}Sumryz{% endblock %}</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    {% block head %}{% endblock %}
 </head>
 <body>
-    {% block content %}
-    {% endblock %}
-    <footer>
-        <p>&copy; 2023 Lecture Summarizer</p>
+    <header>
+        <nav class="navbar">
+            <div class="logo">
+                <a href="{{ url_for('main.home') }}">📘 Sumryz</a>
+            </div>
+            <ul class="nav-links">
+                <li><a href="{{ url_for('main.home') }}">Home</a></li>
+                {% if current_user.is_authenticated %}
+                    <li><a href="{{ url_for('auth.logout') }}">Logout</a></li>
+                    <li><a href="{{ url_for('auth.delete_account') }}" class="btn-primary">Delete Account</a></li>
+                {% else %}
+                    <li><a href="{{ url_for('auth.login') }}">Login</a></li>
+                    <li><a href="{{ url_for('auth.sign_up') }}" class="btn-primary">Sign Up</a></li>
+                {% endif %}
+            </ul>
+        </nav>
+    </header>
+    <main class="centered-content">
+        {% block content %}{% endblock %}
+    </main>
+    <footer class="footer">
+        <p>&copy; {{ current_year if current_year else 2025 }}Sumryz</p>
     </footer>
 </body>
 </html>

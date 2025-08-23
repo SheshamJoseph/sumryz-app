@@ -5,8 +5,8 @@ from pypdf import PdfReader
 ALLOWED_EXTENSIONS = {'txt', 'pdf', 'docx'}
 
 def extract_text_from_file(file_path):
-    ext = os.path.splitext(file_path)[1].lower()
-    
+    ext = os.path.splitext(file_path.filename)[1].lower()
+
     if ext == '.txt':
         with open(file_path, 'r', encoding='utf-8') as file:
             return file.read()
@@ -55,6 +55,6 @@ def cohere_summarizer(text_document) -> str:
         raise RuntimeError(f"Failed to summarize text: {str(e)}")
     
     if response.message:
-        return response.message.content.strip()    # type: ignore
+        return response.message.content[0].text  
     else:
         raise RuntimeError(f"Failed to summarize text: No message in response.")
