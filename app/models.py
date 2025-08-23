@@ -50,7 +50,7 @@ class Documents(db.Model):
     id = db.Column(db.Integer, primary_key=True)
     user_id = db.Column(db.Integer, db.ForeignKey('users.id'), nullable=False)
     title = db.Column(db.String(200), nullable=False)
-    file_path = db.Column(db.String(255), nullable=False)
+    summary_filepath = db.Column(db.String(255), nullable=False)
     created_at = db.Column(db.DateTime, default=datetime.now(), nullable=False)
     
-    user = db.relationship('User', backref=db.backref('documents', lazy=True))
+    user = db.relationship('User', backref=db.backref('documents', lazy=True, cascade="all, delete-orphan"))    # cascade delete to remove documents when user is deleted
