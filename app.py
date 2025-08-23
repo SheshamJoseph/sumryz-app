@@ -10,5 +10,12 @@ app = create_app(os.getenv('FLASK_CONFIG') or 'default')
 def make_shell_context():
     return dict(db=db, User=User)
 
+
+@app.cli.command("init-db")
+def init_db():
+    """Create all database tables."""
+    db.create_all()
+    print("Database tables created.")
+
 if __name__ == "__main__":
     app.run(debug=True)

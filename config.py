@@ -1,9 +1,13 @@
 import os
+from dotenv import load_dotenv
+    
+# load environment variables from .env file
+load_dotenv()
 
 basedir = os.path.abspath(os.path.dirname(__file__)) # Get the directory of the current file
 
 class Config:
-    SECRET_KEY = os.environ.get('SECRET_KEY') or 'sghcjnjdscnjknducjnnuebfcncnjdncn'
+    SECRET_KEY = os.getenv('SECRET_KEY')
     UPLOAD_FOLDER = os.path.join(basedir, 'instance', 'uploads')
     SUMMARY_FOLDER = os.path.join(basedir, 'instance', 'summaries')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
