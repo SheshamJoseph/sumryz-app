@@ -1,3 +1,4 @@
+from datetime import timedelta
 import os
 from dotenv import load_dotenv
     
@@ -11,8 +12,9 @@ class Config:
     UPLOAD_FOLDER = os.path.join(basedir, 'instance', 'uploads')
     SUMMARY_FOLDER = os.path.join(basedir, 'instance', 'summaries')
     MAX_CONTENT_LENGTH = 16 * 1024 * 1024
-    ALLLOWED_EXTENSIONS = {'txt', 'pdf', 'docx', 'doc'}
-    
+    ALLOWED_EXTENSIONS = {'txt', 'pdf', 'docx', 'doc'}
+    REMEMBER_COOKIE_DURATION = timedelta(days=7)  # 7 days
+
     @staticmethod
     def init_app(app):
         os.makedirs(Config.UPLOAD_FOLDER, exist_ok=True)
